@@ -1,0 +1,3 @@
+/home/swo3/Uebungen/ue03/build/CMakeFiles/bsp-1.dir
+/home/swo3/Uebungen/ue03/build/CMakeFiles/edit_cache.dir
+/home/swo3/Uebungen/ue03/build/CMakeFiles/rebuild_cache.dir

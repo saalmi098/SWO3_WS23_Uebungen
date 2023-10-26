@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "geo.h": "c",
+        "stdlib.h": "c"
+    }
+}

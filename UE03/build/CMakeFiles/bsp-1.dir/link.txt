@@ -1,0 +1,1 @@
+/usr/bin/cc "CMakeFiles/bsp-1.dir/src/bsp-1/geo/geo.c.o" "CMakeFiles/bsp-1.dir/src/bsp-1/main.c.o" "CMakeFiles/bsp-1.dir/src/bsp-1/weight/weight.c.o" -o bin/bsp-1  -lm 
