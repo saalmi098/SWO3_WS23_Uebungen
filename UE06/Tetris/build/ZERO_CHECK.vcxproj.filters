@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Andi\repos\SWO3_WS23\SWO3_WS23_Uebungen\UE06\Tetris\build\CMakeFiles\fdf26a4374d64ccd141cf145ff082906\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{4B64020A-88CB-364C-925B-24487BAE0CAD}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
