@@ -17,5 +17,6 @@ bool is_valid_position(position const pos);
 block get_current_block();
 bool try_move_current(int const dx, int const dy);
 bool try_move(block * b, int const dx, int const dy);
+void check_completed_rows(void);
 
 #endif

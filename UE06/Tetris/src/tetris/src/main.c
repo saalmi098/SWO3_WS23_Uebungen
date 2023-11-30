@@ -1,12 +1,13 @@
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "timer.h"
 #include "gameboard.h"
 #include "renderer.h"
 #include "types.h"
 
-void on_current_block_collided(void);
+void on_current_block_collision(void);
 
 void gameloop(key_t const key, action_t const action) {
 	int dx = 0;
@@ -21,19 +22,17 @@ void gameloop(key_t const key, action_t const action) {
 	if (action == action_press || action == action_repeat) {
 		bool move_successful = try_move_current(dx, dy);
 		if (!move_successful && dx == 0) {
-			on_current_block_collided();
+			on_current_block_collision();
 		}
 	}
 }
 
-void on_current_block_collided(void) {
+void on_current_block_collision(void) {
 	// fix block at current position and spawn new block
 	block current = get_current_block();
 	set_block_at(current.pos, current);
 
-	// todo clear full rows (bottom up) (nested loops)
-	// for block in fixedblocks (bottom up)
-	//		while (try_move()) #move_down
+	check_completed_rows();
 
 	spawn_new_block();
 }
@@ -48,7 +47,7 @@ void render_blocks(void) {
 			block b = get_block_at(pos);
 			if (!is_empty_block(b))
 			{
-				renderer_render(b.pos, b.color);
+				renderer_render(pos, b.color); // TODO maybe use b.pos if weird errors occur
 			}
 		}
 	}

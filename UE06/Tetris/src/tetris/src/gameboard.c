@@ -8,6 +8,8 @@ block current;
 const block empty_block = { { -1, -1 }, color_black }; // representation for "no block" at this position
 block fixedBlocks[GB_ROWS * GB_COLS];
 
+bool is_row_completed(int row);
+
 void init_gameboard(void) {
 	for (int y = 0; y < GB_ROWS; y++) {
 		for (int x = 0; x < GB_COLS; x++) {
@@ -71,4 +73,33 @@ bool try_move(block * b, int const dx, int const dy) {
 	}
 
 	return false;
+}
+
+bool is_row_completed(int row) {
+	for (int col = 0; col < GB_COLS; col++) {
+		position pos = { col, row };
+		block b = get_block_at(pos);
+		if (is_empty_block(b))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void check_completed_rows(void) {
+	for (int row = 0; row < GB_ROWS; row++) {
+		if (is_row_completed(row)) {
+			// clear row
+			for (int col = 0; col < GB_COLS; col++) {
+				position pos = { col, row };
+				set_block_at(pos, empty_block);
+			}
+
+			// TODO Move all blocks above down
+			// for block in fixedblocks (bottom up)
+			//		while (try_move()) #move_down
+		}
+	}
 }
