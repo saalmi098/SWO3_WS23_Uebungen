@@ -6,6 +6,8 @@
 #include "renderer.h"
 #include "types.h"
 
+void on_current_block_collided(void);
+
 void gameloop(key_t const key, action_t const action) {
 	int dx = 0;
 	int dy = 0;
@@ -16,15 +18,24 @@ void gameloop(key_t const key, action_t const action) {
 		case key_right: dx = 1; break;
 	}
 
-	if (action == action_press) {
+	if (action == action_press || action == action_repeat) {
 		bool move_successful = try_move_current(dx, dy);
-		if (!move_successful) {
-			// fix block at current position and spawn new block
-			block current = get_current_block();
-			set_block_at(current.pos, current);
-			spawn_new_block();
+		if (!move_successful && dx == 0) {
+			on_current_block_collided();
 		}
 	}
+}
+
+void on_current_block_collided(void) {
+	// fix block at current position and spawn new block
+	block current = get_current_block();
+	set_block_at(current.pos, current);
+
+	// todo clear full rows (bottom up) (nested loops)
+	// for block in fixedblocks (bottom up)
+	//		while (try_move()) #move_down
+
+	spawn_new_block();
 }
 
 void render_blocks(void) {
@@ -52,6 +63,8 @@ void on_timer_elapsed(void) {
 }
 
 int main() {
+	// TODO Repo in ue05-saalmi umziehen!!!!
+
 	init_gameboard();
 	renderer_init(GB_ROWS, GB_COLS, on_key_pressed);
 	timer_init(on_timer_elapsed);

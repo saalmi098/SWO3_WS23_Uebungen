@@ -34,23 +34,6 @@ bool is_empty_block(block const b) {
 		&& b.color == empty_block.color;
 }
 
-color get_random_color() {
-	// List of available colors
-	color available_colors[] = {
-		color_black, color_red, color_green, color_blue,
-		color_yellow, color_magenta, color_cyan, color_white
-	};
-
-	// Calculate the number of available colors
-	int num_colors = sizeof(available_colors) / sizeof(available_colors[0]);
-
-	// Generate a random index within the available colors
-	int random_index = rand() % num_colors;
-
-	// Return the randomly selected color
-	return available_colors[random_index];
-}
-
 void spawn_new_block(void) {
 	current.pos.x = GB_COLS / 2;
 	current.pos.y = GB_ROWS - 1;
@@ -62,12 +45,12 @@ block get_current_block(void) {
 	return current;
 }
 
-bool gb_is_valid_position(position const pos) {
+bool is_valid_position(position const pos) {
 	bool inBoundaries = pos.x >= 0 && pos.x < GB_COLS && pos.y >= 0 && pos.y < GB_ROWS;
 	if (!inBoundaries)
 		return false;
 
-	// TODO Collision detection
+	// TODO Exact collision detection
 	block b = get_block_at(pos);
 	return is_empty_block(b);
 }
@@ -77,12 +60,12 @@ bool try_move_current(int const dx, int const dy) {
 }
 
 bool try_move(block * b, int const dx, int const dy) {
-	//assert(b != NULL); // TODO Warum funktioniert das assert nicht? Compiler-Error...
+	assert(b != NULL);
 	position pos = b->pos;
 	pos.x += dx;
 	pos.y += dy;
 
-	if (gb_is_valid_position(pos)) {
+	if (is_valid_position(pos)) {
 		b->pos = pos;
 		return true;
 	}
