@@ -21,4 +21,21 @@ typedef struct {
 	color color;
 } block;
 
+typedef enum {
+	key_down,
+	key_left,
+	key_right,
+	key_up,
+	key_q,
+	key_e,
+} key_t;
+
+typedef enum {
+	action_press,
+	action_repeat,
+	action_release,
+} action_t;
+
+typedef void(*key_callback)(key_t, action_t);
+
 #endif

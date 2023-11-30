@@ -4,26 +4,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "renderer.h"
-#include "gameboard.h"
-
-block current = { {GB_COLS / 2, GB_ROWS - 1}, color_green };
-
-block get_current_block() {
-	return current;
-}
-
-bool try_move(int const dx, int const dy) {
-	position pos = current.pos;
-	pos.x += dx;
-	pos.y += dy;
-
-	if (gb_is_valid_position(pos)) {
-		current.pos = pos;
-		return true;
-	}
-
-	return false;
-}
 
 _Noreturn
 static
