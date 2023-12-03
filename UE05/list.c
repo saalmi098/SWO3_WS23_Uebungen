@@ -49,3 +49,21 @@ void clear (node_type * * pp_head) {
         p_free = NULL; // dangling pointer eliminieren
     }
 }
+
+void reverse (node_type * * pp_head) {
+    assert(pp_head != NULL);
+
+    node_type * n = *pp_head;
+    node_type * pred = NULL;
+    node_type * succ = NULL;
+    while (n != NULL) {
+        succ = n->p_next;
+
+        n->p_next = pred; // reverse linking
+
+        pred = n;
+        n = succ;
+    }
+
+    *pp_head = pred;
+}
