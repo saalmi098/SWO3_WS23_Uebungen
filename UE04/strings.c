@@ -43,7 +43,7 @@ void test_2() {
     char s3[100] = "Softwarepark";
 
     printf("strcmp: %d\n", strcmp("Susi", "Hansi"));
-    printf("strcmp: %d\n", strcmp("FH", s1)); // returns -32 because of "FH " (space at end)
+    printf("strcmp: %d\n", strcmp("FH", s1)); // returns -32 because of "FH " (space at end = ASCII-Dec 32)
 
     print_string(s3); print_string("\n");
     strcpy(s3, s2); // copies the 10 bytes from "Hagenberg\0" to s3
@@ -64,7 +64,6 @@ void test_3() {
 }
 
 // dynamic programming
-
 int change_dp(
     int const M,        // M(oney) ... zu wechselnder Betrag, 
     int const c[],      // c(oins) ... Array der Coins (Stückelung)

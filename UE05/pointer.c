@@ -67,12 +67,13 @@ int * bar (void) {
 }
 
 void test_3(void) {
-       // *foo() = 42;
+    // *foo() = 42;
     *bar() = 42;
 }
 
 int main (void) {
     // test_1();
-    test_2();
+    // test_2();
+    test_3();
     return EXIT_SUCCESS;
 }
