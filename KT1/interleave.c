@@ -27,17 +27,13 @@ char* interleave(const char *a, const char *b) {
 int main() {
     char * res1 = interleave("abcd", "1234");  // -> "a1b2c3d4"
     char * res2 = interleave("abc",  ",,,");   // -> "a,b,c,"
-    char * res3 = interleave("d lie uesh",  "ukenrhrnon");   // -> ???
     printf("%s\n", res1);
     printf("%s\n", res2);
-    printf("%s\n", res3);
     
     free(res1);
     free(res2);
-    free(res3);
     res1 = NULL;
     res2 = NULL;
-    res3 = NULL;
     
     return EXIT_SUCCESS;
 }
