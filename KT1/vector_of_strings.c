@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 typedef struct vector_of_strings {
@@ -32,7 +33,11 @@ void set (vector_of_strings * p_vector, int index, char const * p_string) {
         p_vector->elements[index] = NULL;
     }
 
-    p_vector->elements[index] = p_string;
+    if (p_string != NULL) {
+        p_vector->elements[index] = malloc(strlen(p_string) + 1); // +1 for null terminator
+        assert(p_vector->elements[index] != NULL);
+        strcpy(p_vector->elements[index], p_string);
+    }
 }
 
 void print_vector(vector_of_strings * p_vector) {
@@ -50,14 +55,12 @@ void print_vector(vector_of_strings * p_vector) {
 void dispose_vector(vector_of_strings ** p_vector) {
     assert(p_vector != NULL && (*p_vector) != NULL);
 
-    // freeing of every single string not needed... and does not work?
-    
-    // for (int i = 0; i < (*p_vector)->size; i++) {
-    //     if ((*p_vector)->elements[i] != NULL) {
-    //         free((*p_vector)->elements[i]);
-    //         (*p_vector)->elements[i] = NULL;
-    //     }
-    // }
+    for (int i = 0; i < (*p_vector)->size; i++) {
+        if ((*p_vector)->elements[i] != NULL) {
+            free((*p_vector)->elements[i]);
+            (*p_vector)->elements[i] = NULL;
+        }
+    }
 
     free((*p_vector)->elements);
     (*p_vector)->elements = NULL;
