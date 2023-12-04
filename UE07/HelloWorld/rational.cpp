@@ -22,6 +22,6 @@ std::ostream & rational::write(std::ostream & out) const {
 	return out << std::format("{{{}/{}}}", m_num, m_den);
 }
 
-std::ostream& operator << (std::ostream& lhs, rational const& rhs) {
+/*std::ostream& operator << (std::ostream& lhs, rational const& rhs) {
 	return rhs.write(lhs);
-}
+}*/

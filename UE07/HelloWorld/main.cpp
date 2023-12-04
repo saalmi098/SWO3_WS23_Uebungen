@@ -65,8 +65,32 @@ void test_3() {
 	file << "r: " << r << " some text\n"; // operator overloading notwendig (für shift-left op.)
 }
 
+void test_4() {
+	rational const r1;
+	rational const r2{};
+	rational const r3{ 43 };
+	rational r4{ 42,13 };
+
+	std::cout << "r1: " << r1 << "   // some text\n";
+
+	std::cout << r4 * rational{ 2, 2 } << '\n';
+	std::cout << r4 * r1 << '\n'; // r4 bleibt unverändert
+	std::cout << (r4 *= rational{ 2,2 }) << '\n'; // r4 verändert sich
+
+	std::cout << r4 * 3 << '\n'; // r4 * 3 funktioniert weil Compiler aus "3" einen rational erzeugt,
+								 // mit dem Konstruktor, der 1 int nimmt -> (3/1)
+								 // = "Conversion by Constructor"
+	std::cout << 3 * r4 << '\n';
+
+	std::cout << std::boolalpha << (r4 == rational{ 42,13 }) << '\n'; // std::boolalpha damit 0/1 als False/True ausgegeben wird
+
+	int num{ r4.num()};
+	r4.num() *= 1;
+}
+
 int main() {
 	//test_1();
 	//test_2();
-	test_3();
+	//test_3();
+	test_4();
 }
