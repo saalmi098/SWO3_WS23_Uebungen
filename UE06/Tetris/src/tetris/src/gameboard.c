@@ -88,8 +88,10 @@ bool is_row_completed(int row) {
 	return true;
 }
 
-void check_completed_rows(void) {
-	for (int row = 0; row < GB_ROWS; row++) {
+void check_and_delete_completed_rows(void) {
+	int row = 0;
+	int const highest_row = GB_ROWS - 1; // TODO Performance: get_highest_row() or new global variable
+	while (row <= highest_row) {
 		if (is_row_completed(row)) {
 			// clear row
 			for (int col = 0; col < GB_COLS; col++) {
@@ -97,9 +99,25 @@ void check_completed_rows(void) {
 				set_block_at(pos, empty_block);
 			}
 
-			// TODO Move all blocks above down
-			// for block in fixedblocks (bottom up)
-			//		while (try_move()) #move_down
+			// move all blocks above down
+			for (int tmp_row = row + 1; tmp_row <= highest_row; tmp_row++) {
+				for (int tmp_col = 0; tmp_col < GB_COLS; tmp_col++) {
+					position tmp_pos = { tmp_col, tmp_row };
+					block tmp_b = get_block_at(tmp_pos);
+					if (!is_empty_block(tmp_b)) {
+						// free old pos
+						set_block_at(tmp_pos, empty_block);
+						
+						// set new pos
+						position new_pos = { tmp_col, tmp_row - 1 };
+						tmp_b.pos = new_pos;
+						set_block_at(new_pos, tmp_b);
+					}
+				}
+			}
+		}
+		else {
+			row++;
 		}
 	}
 }

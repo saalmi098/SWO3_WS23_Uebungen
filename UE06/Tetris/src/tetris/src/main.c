@@ -25,6 +25,20 @@ void gameloop(key_t const key, action_t const action) {
 			on_current_block_collision();
 		}
 	}
+
+	if (key == key_q) {
+		// TODO Delete
+
+		position pos1 = { 0, 0 };
+		block b1 = { pos1, color_red };
+		position pos2 = { 0, 1 };
+		block b2 = { pos1, color_red };
+
+		set_block_at(pos1, b1);
+		set_block_at(pos2, b2);
+
+		check_and_delete_completed_rows();
+	}
 }
 
 void on_current_block_collision(void) {
@@ -32,7 +46,7 @@ void on_current_block_collision(void) {
 	block current = get_current_block();
 	set_block_at(current.pos, current);
 
-	check_completed_rows();
+	check_and_delete_completed_rows();
 
 	spawn_new_block();
 }
