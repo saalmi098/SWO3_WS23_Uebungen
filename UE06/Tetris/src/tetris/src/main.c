@@ -7,7 +7,7 @@
 #include "renderer.h"
 #include "types.h"
 
-void on_current_block_collision(void);
+void on_current_tetrimino_collision(void);
 
 void gameloop(key_t const key, action_t const action) {
 	int dx = 0;
@@ -22,7 +22,7 @@ void gameloop(key_t const key, action_t const action) {
 	if (action == action_press || action == action_repeat) {
 		bool move_successful = try_move_current(dx, dy);
 		if (!move_successful && dx == 0) {
-			on_current_block_collision();
+			on_current_tetrimino_collision();
 		}
 	}
 
@@ -41,19 +41,23 @@ void gameloop(key_t const key, action_t const action) {
 	}
 }
 
-void on_current_block_collision(void) {
-	// fix block at current position and spawn new block
-	block current = get_current_block();
-	set_block_at(current.pos, current);
+void on_current_tetrimino_collision(void) {
+	// fix tetrimino blocks at current position and spawn new tetrimino
+	tetrimino current = get_current_tetrimino();
+	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
+		set_block_at(current.blocks[i].pos, current.blocks[i]);
+	}
 
 	check_and_delete_completed_rows();
 
-	spawn_new_block();
+	spawn_new_tetrimino();
 }
 
 void render_blocks(void) {
-	block current = get_current_block();
-	renderer_render(current.pos, current.color);
+	tetrimino current = get_current_tetrimino();
+	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
+		renderer_render(current.blocks[i].pos, current.blocks[i].color);
+	}
 
 	for (int y = 0; y < GB_ROWS; y++) {
 		for (int x = 0; x < GB_COLS; x++) {
@@ -82,7 +86,7 @@ int main() {
 	renderer_init(GB_ROWS, GB_COLS, on_key_pressed);
 	timer_init(on_timer_elapsed);
 
-	spawn_new_block();
+	spawn_new_tetrimino();
 
 	while(renderer_open()) {
 		renderer_begin_frame();
