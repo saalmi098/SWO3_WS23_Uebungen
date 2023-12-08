@@ -3,6 +3,7 @@
 
 #define NUM_TETRIMINOS 7
 #define NUM_TETRIMINO_BLOCKS 4
+#define NUM_ROTATIONS 4
 
 typedef enum {
 	color_black   = 0,
@@ -27,6 +28,10 @@ typedef struct {
 
 typedef struct {
 	block blocks[NUM_TETRIMINO_BLOCKS];
+} tetrimino_rotation;
+
+typedef struct {
+	tetrimino_rotation rotations[NUM_ROTATIONS];
 } tetrimino;
 
 typedef enum {

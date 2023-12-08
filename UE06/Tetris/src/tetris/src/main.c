@@ -19,33 +19,23 @@ void gameloop(key_t const key, action_t const action) {
 		case key_right: dx = 1; break;
 	}
 
-	if (action == action_press || action == action_repeat) {
+	if (key == key_up && action == action_press) {
+		rotate_current_clockwise();
+	} else if (action == action_press || action == action_repeat) {
 		bool move_successful = try_move_current(dx, dy);
 		if (!move_successful && dx == 0) {
 			on_current_tetrimino_collision();
 		}
-	}
-
-	if (key == key_q) {
-		// TODO Delete
-
-		position pos1 = { 0, 0 };
-		block b1 = { pos1, color_red };
-		position pos2 = { 0, 1 };
-		block b2 = { pos1, color_red };
-
-		set_block_at(pos1, b1);
-		set_block_at(pos2, b2);
-
-		check_and_delete_completed_rows();
 	}
 }
 
 void on_current_tetrimino_collision(void) {
 	// fix tetrimino blocks at current position and spawn new tetrimino
 	tetrimino current = get_current_tetrimino();
+	int current_rotation = get_current_rotation();
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		set_block_at(current.blocks[i].pos, current.blocks[i]);
+		block b = current.rotations[current_rotation].blocks[i];
+		set_block_at(b.pos, b);
 	}
 
 	check_and_delete_completed_rows();
@@ -55,8 +45,10 @@ void on_current_tetrimino_collision(void) {
 
 void render_blocks(void) {
 	tetrimino current = get_current_tetrimino();
+	int current_rotation = get_current_rotation();
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		renderer_render(current.blocks[i].pos, current.blocks[i].color);
+		block b = current.rotations[current_rotation].blocks[i];
+		renderer_render(b.pos, b.color);
 	}
 
 	for (int y = 0; y < GB_ROWS; y++) {

@@ -6,6 +6,9 @@
 #include "types.h"
 
 tetrimino current;
+int current_form = 0;
+int current_rotation = 0;
+
 const tetrimino tetriminos[NUM_TETRIMINOS];
 
 const block empty_block = { { -1, -1 }, color_black }; // representation for "no block" at this position
@@ -40,20 +43,6 @@ bool is_empty_block(block const b) {
 		&& b.color == empty_block.color;
 }
 
-void spawn_new_tetrimino(void) {
-	int idx = rand() % NUM_TETRIMINOS;
-	
-	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		current.blocks[i] = tetriminos[idx].blocks[i];
-		current.blocks[i].pos.x += GB_COLS / 2;
-		current.blocks[i].pos.y = GB_ROWS - 1 - tetriminos[idx].blocks[i].pos.y;
-	}
-}
-
-tetrimino get_current_tetrimino(void) {
-	return current;
-}
-
 bool is_valid_position(position const pos) {
 	bool inBoundaries = pos.x >= 0 && pos.x < GB_COLS && pos.y >= 0 && pos.y < GB_ROWS;
 	if (!inBoundaries)
@@ -64,10 +53,34 @@ bool is_valid_position(position const pos) {
 	return is_empty_block(b);
 }
 
+void spawn_new_tetrimino(void) {
+	current_form = rand() % NUM_TETRIMINOS;
+	current_form = 0;
+	
+	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
+		current.rotations[i] = tetriminos[current_form].rotations[i];
+		for (int j = 0; j < NUM_TETRIMINO_BLOCKS; j++) {
+			current.rotations[i].blocks[j].pos.x += GB_COLS / 2;
+			current.rotations[i].blocks[j].pos.y = GB_ROWS - 1
+				- tetriminos[current_form].rotations[i].blocks[j].pos.y;
+		}
+	}
+
+	current_rotation = 0;
+}
+
+tetrimino get_current_tetrimino(void) {
+	return current;
+}
+
+int get_current_rotation(void) {
+	return current_rotation;
+}
+
 bool try_move_current(int const dx, int const dy) {
 	bool can_move_tetrimino = true;
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		if (!can_move(current.blocks[i], dx, dy)) {
+		if (!can_move(current.rotations[current_rotation].blocks[i], dx, dy)) {
 			can_move_tetrimino = false;
 			break;
 		}
@@ -75,14 +88,14 @@ bool try_move_current(int const dx, int const dy) {
 
 	if (can_move_tetrimino) {
 		for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-			try_move(&current.blocks[i], dx, dy);
+			try_move(&current.rotations[current_rotation].blocks[i], dx, dy);
 		}
 	}
 	
 	return can_move_tetrimino;
 }
 
-bool try_move(block* b, int const dx, int const dy) {
+bool try_move(block * b, int const dx, int const dy) {
 	assert(b != NULL);
 	position pos = b->pos;
 	pos.x += dx;
@@ -151,6 +164,63 @@ void check_and_delete_completed_rows(void) {
 	}
 }
 
+// Funktion zur Rotation der Tetrimino-Blöcke um 90 Grad im Uhrzeigersinn
+void rotate_current_clockwise(void) {
+	// TODO...
+	int next_rotation = (current_rotation + 1) % NUM_ROTATIONS;
+
+	tetrimino_rotation old_rot = current.rotations[current_rotation];
+	current.rotations[current_rotation] = current.rotations[next_rotation];
+	current.rotations[next_rotation] = old_rot;
+
+	current_rotation = next_rotation;
+
+	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
+		current.rotations[current_rotation].blocks[i].pos.x =
+			old_rot.blocks[i].pos.x
+			+ tetriminos[current_form].rotations[current_rotation].blocks[i].pos.x;
+		current.rotations[current_rotation].blocks[i].pos.y =
+			old_rot.blocks[i].pos.y
+			+ tetriminos[current_form].rotations[current_rotation].blocks[i].pos.y;
+	}
+}
+
+const tetrimino tetriminos[NUM_TETRIMINOS] = {
+	// I
+	{ {
+		// Rotation 0 (0°)
+		{ {
+			{ { 0, 0 }, color_cyan },
+			{ { 0, 1 }, color_cyan },
+			{ { 0, 2 }, color_cyan },
+			{ { 0, 3 }, color_cyan }
+		} },
+		// Rotation 1 (90°)
+		{ {
+			{ { 0, 0 }, color_cyan },
+			{ { 1, 0 }, color_cyan },
+			{ { 2, 0 }, color_cyan },
+			{ { 3, 0 }, color_cyan }
+		} },
+		// Rotation 2 (180°)
+		{ {
+			{ { 0, 0 }, color_cyan },
+			{ { 0, -1 }, color_cyan },
+			{ { 0, -2 }, color_cyan },
+			{ { 0, -3 }, color_cyan }
+		} },
+		// Rotation 3 (270°)
+		{ {
+			{ { 0, 0 }, color_cyan },
+			{ { -1, 0 }, color_cyan },
+			{ { -2, 0 }, color_cyan },
+			{ { -3, 0 }, color_cyan }
+		} }
+	} }
+	// TODO Define other Tetriminos similarly with their rotations
+};
+
+/* OLD (without rotations)
 const tetrimino tetriminos[NUM_TETRIMINOS] = {
 	// I
 	{
@@ -201,4 +271,4 @@ const tetrimino tetriminos[NUM_TETRIMINOS] = {
 		  { { 1, 1 }, color_red },
 		  { { 2, 1 }, color_red } }
 	}
-};
+};*/
