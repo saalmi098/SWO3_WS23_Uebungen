@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "timer.h"
 #include "gameboard.h"
@@ -35,11 +37,14 @@ void gameloop(key_t const key, action_t const action) {
 void on_current_tetrimino_collision(void) {
 	// fix tetrimino blocks at current position and spawn new tetrimino
 	tetrimino current = get_current_tetrimino();
-	int current_rotation = get_current_rotation();
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		block b = current.rotations[current_rotation].blocks[i];
+		block b = current.rotations[0].blocks[i];
 		set_block_at(b.pos, b);
+		if (get_max_y_of_fixed_blocks() >= GB_ROWS - 1) {
+			printf("gameover\n"); // TODO restart game
+		}
 	}
+
 
 	bool any_row_deleted = check_and_delete_completed_rows();
 	if (any_row_deleted) {
@@ -52,9 +57,8 @@ void on_current_tetrimino_collision(void) {
 
 void render_blocks(void) {
 	tetrimino current = get_current_tetrimino();
-	int current_rotation = get_current_rotation();
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		block b = current.rotations[current_rotation].blocks[i];
+		block b = current.rotations[0].blocks[i];
 		renderer_render(b.pos, b.color);
 	}
 
@@ -80,6 +84,8 @@ void on_timer_elapsed(void) {
 
 int main() {
 	// TODO Repo in ue05-saalmi umziehen!!!!
+
+	srand((unsigned)time(0));
 
 	init_gameboard();
 	renderer_init(GB_ROWS, GB_COLS, on_key_pressed);

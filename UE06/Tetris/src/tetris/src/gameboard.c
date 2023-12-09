@@ -9,7 +9,10 @@ tetrimino current;
 int current_form = 0;
 int current_rotation = 0;
 
+int max_y = -1; // y coordinate of the highest block
+
 const tetrimino tetriminos[NUM_TETRIMINOS];
+const tetrimino_rotation tetriminos_spawn_positions[NUM_TETRIMINOS];
 
 const block empty_block = { { -1, -1 }, color_black }; // representation for "no block" at this position
 block fixedBlocks[GB_ROWS * GB_COLS];
@@ -36,6 +39,10 @@ void set_block_at(position const pos, block const b) {
 	assert(pos.y >= 0 && pos.y < GB_ROWS);
 	assert(pos.x >= 0 && pos.x < GB_COLS);
 	fixedBlocks[pos.y * GB_COLS + pos.x] = b;
+
+	if (!is_empty_block(b) && pos.y > max_y) {
+		max_y = pos.y;
+	}
 }
 
 bool is_empty_block(block const b) {
@@ -55,32 +62,24 @@ bool is_valid_position(position const pos) {
 
 void spawn_new_tetrimino(void) {
 	current_form = rand() % NUM_TETRIMINOS;
-	current_form = 0;
-	
-	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		current.rotations[i] = tetriminos[current_form].rotations[i];
-		for (int j = 0; j < NUM_TETRIMINO_BLOCKS; j++) {
-			current.rotations[i].blocks[j].pos.x += GB_COLS / 2;
-			current.rotations[i].blocks[j].pos.y = GB_ROWS - 1
-				- tetriminos[current_form].rotations[i].blocks[j].pos.y;
-		}
-	}
-
 	current_rotation = 0;
+
+	current.rotations[0] = tetriminos_spawn_positions[current_form];
+	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
+		current.rotations[0].blocks[i].pos.x += GB_COLS / 2;
+		current.rotations[0].blocks[i].pos.y = GB_ROWS - 1
+			- tetriminos_spawn_positions[current_form].blocks[i].pos.y;
+	}
 }
 
 tetrimino get_current_tetrimino(void) {
 	return current;
 }
 
-int get_current_rotation(void) {
-	return current_rotation;
-}
-
 bool try_move_current(int const dx, int const dy) {
 	bool can_move_tetrimino = true;
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		if (!can_move(current.rotations[current_rotation].blocks[i], dx, dy)) {
+		if (!can_move(current.rotations[0].blocks[i], dx, dy)) {
 			can_move_tetrimino = false;
 			break;
 		}
@@ -88,7 +87,7 @@ bool try_move_current(int const dx, int const dy) {
 
 	if (can_move_tetrimino) {
 		for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-			try_move(&current.rotations[current_rotation].blocks[i], dx, dy);
+			try_move(&current.rotations[0].blocks[i], dx, dy);
 		}
 	}
 	
@@ -132,7 +131,7 @@ bool is_row_completed(int row) {
 
 bool check_and_delete_completed_rows(void) {
 	int row = 0;
-	int const highest_row = GB_ROWS - 1; // TODO Performance: get_highest_row() or new global variable
+	int const highest_row = max_y;
 	bool any_row_deleted = false;
 	while (row <= highest_row) {
 		if (is_row_completed(row)) {
@@ -159,6 +158,7 @@ bool check_and_delete_completed_rows(void) {
 				}
 			}
 
+			max_y--;
 			any_row_deleted = true;
 		}
 		else {
@@ -171,83 +171,262 @@ bool check_and_delete_completed_rows(void) {
 
 // Funktion zur Rotation der Tetrimino-Blöcke um 90 Grad im Uhrzeigersinn
 void rotate_current_clockwise(void) {
-	// TODO...
-	int next_rotation = (current_rotation + 1) % NUM_ROTATIONS;
-
-	tetrimino_rotation old_rot = current.rotations[current_rotation];
-	current.rotations[current_rotation] = current.rotations[next_rotation];
-	current.rotations[next_rotation] = old_rot;
-
-	current_rotation = next_rotation;
-
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		current.rotations[current_rotation].blocks[i].pos.x =
-			old_rot.blocks[i].pos.x
-			+ tetriminos[current_form].rotations[current_rotation].blocks[i].pos.x;
-		current.rotations[current_rotation].blocks[i].pos.y =
-			old_rot.blocks[i].pos.y
-			+ tetriminos[current_form].rotations[current_rotation].blocks[i].pos.y;
+		current.rotations[0].blocks[i].pos.x +=
+			tetriminos[current_form].rotations[current_rotation].blocks[i].pos.x;
+		current.rotations[0].blocks[i].pos.y +=
+			tetriminos[current_form].rotations[current_rotation].blocks[i].pos.y;
 	}
+
+	current_rotation = (current_rotation + 1) % NUM_ROTATIONS;
+}
+
+int get_max_y_of_fixed_blocks(void) {
+	return max_y;
 }
 
 const tetrimino tetriminos[NUM_TETRIMINOS] = {
 	// I
 	{ {
-		// Rotation 0 (0°)
+		// Rotation 0° -> 90°
 		{ {
+			{ { -1, -1 }, color_cyan },
 			{ { 0, 0 }, color_cyan },
-			{ { 0, 1 }, color_cyan },
-			{ { 0, 2 }, color_cyan },
-			{ { 0, 3 }, color_cyan }
+			{ { 1, 1 }, color_cyan },
+			{ { 2, 2 }, color_cyan }
 		} },
-		// Rotation 1 (90°)
+		// Rotation 90° -> 180°
 		{ {
-			{ { 0, 0 }, color_cyan },
+			{ { 2, 1 }, color_cyan },
 			{ { 1, 0 }, color_cyan },
-			{ { 2, 0 }, color_cyan },
-			{ { 3, 0 }, color_cyan }
-		} },
-		// Rotation 2 (180°)
-		{ {
-			{ { 0, 0 }, color_cyan },
 			{ { 0, -1 }, color_cyan },
-			{ { 0, -2 }, color_cyan },
-			{ { 0, -3 }, color_cyan }
+			{ { -1, -2 }, color_cyan }
 		} },
-		// Rotation 3 (270°)
+		// Rotation 180° -> 270°
 		{ {
+			{ { -2, -2 }, color_cyan },
+			{ { -1, -1 }, color_cyan },
 			{ { 0, 0 }, color_cyan },
+			{ { 1, 1 }, color_cyan }
+		} },
+		// Rotation 270° -> 0°
+		{ {
+			{ { 1, 2 }, color_cyan },
+			{ { 0, 1 }, color_cyan },
 			{ { -1, 0 }, color_cyan },
-			{ { -2, 0 }, color_cyan },
-			{ { -3, 0 }, color_cyan }
-		} }
-	} }
-	// TODO Define other Tetriminos similarly with their rotations
+			{ { -2, -1 }, color_cyan }
+		} },
+	} },
+	// J
+	{ {
+		// Rotation 0° -> 90°
+		{ {
+			{ { 1, -1 }, color_blue },
+			{ { 0, 0 }, color_blue },
+			{ { -1, 1 }, color_blue },
+			{ { 0, 2 }, color_blue }
+		} },
+		// Rotation 90° -> 180°
+		{ {
+			{ { -1, -1 }, color_blue },
+			{ { 0, 0 }, color_blue },
+			{ { 1, 1 }, color_blue },
+			{ { 2, 0 }, color_blue }
+		} },
+		// Rotation 180° -> 270°
+		{ {
+			{ { -1, 1 }, color_blue },
+			{ { 0, 0 }, color_blue },
+			{ { 1, -1 }, color_blue },
+			{ { 0, -2 }, color_blue }
+		} },
+		// Rotation 270° -> 0°
+		{ {
+			{ { 1, 1 }, color_blue },
+			{ { 0, 0 }, color_blue },
+			{ { -1, -1 }, color_blue },
+			{ { -2, 0 }, color_blue }
+		} },
+	} },
+	// L
+	{ {
+		// Rotation 0° -> 90°
+		{ {
+			{ { 1, -1 }, color_orange },
+			{ { 0, 0 }, color_orange },
+			{ { -1, 1 }, color_orange },
+			{ { -2, 0 }, color_orange }
+		} },
+		// Rotation 90° -> 180°
+		{ {
+			{ { -1, -1 }, color_orange },
+			{ { 0, 0 }, color_orange },
+			{ { 1, 1 }, color_orange },
+			{ { 0, 2 }, color_orange }
+		} },
+		// Rotation 180° -> 270°
+		{ {
+			{ { -1, 1 }, color_orange },
+			{ { 0, 0 }, color_orange },
+			{ { 1, -1 }, color_orange },
+			{ { 2, 0 }, color_orange }
+		} },
+		// Rotation 270° -> 0°
+		{ {
+			{ { 1, 1 }, color_orange },
+			{ { 0, 0 }, color_orange },
+			{ { -1, -1 }, color_orange },
+			{ { 0, -2 }, color_orange }
+		} },
+	} },
+	// O
+	{ {
+		// Rotation 0° -> 90°
+		{ {
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow }
+		} },
+		// Rotation 90° -> 180°
+		{ {
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow }
+		} },
+		// Rotation 180° -> 270°
+		{ {
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow }
+		} },
+		// Rotation 270° -> 0°
+		{ {
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow },
+			{ { 0, 0 }, color_yellow }
+		} },
+	} },
+	// S
+	{ {
+		// Rotation 0° -> 90°
+		{ {
+			{ { 1, -1 }, color_green },
+			{ { 0, -2 }, color_green },
+			{ { 1, 1 }, color_green },
+			{ { 0, 0 }, color_green }
+		} },
+		// Rotation 90° -> 180°
+		{ {
+			{ { -1, -1 }, color_green },
+			{ { -2, 0 }, color_green },
+			{ { 1, -1 }, color_green },
+			{ { 0, 0 }, color_green }
+		} },
+		// Rotation 180° -> 270°
+		{ {
+			{ { -1, 1 }, color_green },
+			{ { 0, 2 }, color_green },
+			{ { -1, -1 }, color_green },
+			{ { 0, 0 }, color_green }
+		} },
+		// Rotation 270° -> 0°
+		{ {
+			{ { 1, 1 }, color_green },
+			{ { 2, 0 }, color_green },
+			{ { -1, 1 }, color_green },
+			{ { 0, 0 }, color_green }
+		} },
+	} },
+	// T
+	{ {
+		// Rotation 0° -> 90°
+		{ {
+			{ { 1, -1 }, color_magenta },
+			{ { 1, 1 }, color_magenta },
+			{ { 0, 0 }, color_magenta },
+			{ { -1, -1 }, color_magenta }
+		} },
+		// Rotation 90° -> 180°
+		{ {
+			{ { -1, -1 }, color_magenta },
+			{ { 1, -1 }, color_magenta },
+			{ { 0, 0 }, color_magenta },
+			{ { -1, 1 }, color_magenta }
+		} },
+		// Rotation 180° -> 270°
+		{ {
+			{ { -1, 1 }, color_magenta },
+			{ { -1, -1 }, color_magenta },
+			{ { 0, 0 }, color_magenta },
+			{ { 1, 1 }, color_magenta }
+		} },
+		// Rotation 270° -> 0°
+		{ {
+			{ { 1, 1 }, color_magenta },
+			{ { -1, 1 }, color_magenta },
+			{ { 0, 0 }, color_magenta },
+			{ { 1, -1 }, color_magenta }
+		} },
+	} },
+	// Z
+	{ {
+		// Rotation 0° -> 90°
+		{ {
+			{ { 2, 0 }, color_red },
+			{ { 1, -1 }, color_red },
+			{ { 0, 0 }, color_red },
+			{ { -1, -1 }, color_red }
+		} },
+		// Rotation 90° -> 180°
+		{ {
+			{ { 0, -2 }, color_red },
+			{ { -1, -1 }, color_red },
+			{ { 0, 0 }, color_red },
+			{ { -1, 1 }, color_red }
+		} },
+		// Rotation 180° -> 270°
+		{ {
+			{ { -2, 0 }, color_red },
+			{ { -1, 1 }, color_red },
+			{ { 0, 0 }, color_red },
+			{ { 1, 1 }, color_red }
+		} },
+		// Rotation 270° -> 0°
+		{ {
+			{ { 0, 2 }, color_red },
+			{ { 1, 1 }, color_red },
+			{ { 0, 0 }, color_red },
+			{ { 1, -1 }, color_red }
+		} },
+	} },
 };
 
-/* OLD (without rotations)
-const tetrimino tetriminos[NUM_TETRIMINOS] = {
+const tetrimino_rotation tetriminos_spawn_positions[NUM_TETRIMINOS] = {
 	// I
-	{
-		{ { { 0, 0 }, color_cyan },
-		  { { 0, 1 }, color_cyan },
-		  { { 0, 2 }, color_cyan },
-		  { { 0, 3 }, color_cyan } }
-	},
+	{ {
+		{ { 0, 0 }, color_cyan },
+		{ { 0, 1 }, color_cyan },
+		{ { 0, 2 }, color_cyan },
+		{ { 0, 3 }, color_cyan }
+	} },
 	// J
 	{
-		{ { { 0, 0 }, color_blue },
-		  { { 0, 1 }, color_blue },
-		  { { 0, 2 }, color_blue },
-		  { { 1, 2 }, color_blue } }
-	},
+		{ { { 1, 0 }, color_blue },
+		  { { 1, 1 }, color_blue },
+		  { { 1, 2 }, color_blue },
+		  { { 0, 2 }, color_blue }
+	} },
 	// L
 	{
-		{ { { 1, 0 }, color_orange },
-		  { { 1, 1 }, color_orange },
-		  { { 1, 2 }, color_orange },
-		  { { 0, 2 }, color_orange } }
-	},
+		{ { { 0, 0 }, color_orange },
+		  { { 0, 1 }, color_orange },
+		  { { 0, 2 }, color_orange },
+		  { { 1, 2 }, color_orange }
+	} },
 	// O
 	{
 		{ { { 0, 0 }, color_yellow },
@@ -276,4 +455,4 @@ const tetrimino tetriminos[NUM_TETRIMINOS] = {
 		  { { 1, 1 }, color_red },
 		  { { 2, 1 }, color_red } }
 	}
-};*/
+};
