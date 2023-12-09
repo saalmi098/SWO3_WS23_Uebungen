@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h> // TODO Delete
 #include <stdbool.h>
 #include <assert.h>
 #include "gameboard.h"
@@ -57,7 +56,6 @@ bool is_valid_position(position const pos) {
 	if (!inBoundaries)
 		return false;
 
-	// TODO Exact collision detection
 	block b = get_block_at(pos);
 	return is_empty_block(b);
 }
@@ -171,16 +169,27 @@ bool check_and_delete_completed_rows(void) {
 	return any_row_deleted;
 }
 
-// Funktion zur Rotation der Tetrimino-Blöcke um 90 Grad im Uhrzeigersinn
 void rotate_current_clockwise(void) {
+	tetrimino_rotation tmp = current.rotations[0];
+
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		current.rotations[0].blocks[i].pos.x +=
+		tmp.blocks[i].pos.x +=
 			tetriminos[current_form].rotations[current_rotation].blocks[i].pos.x;
-		current.rotations[0].blocks[i].pos.y +=
+		tmp.blocks[i].pos.y +=
 			tetriminos[current_form].rotations[current_rotation].blocks[i].pos.y;
 	}
 
-	current_rotation = (current_rotation + 1) % NUM_ROTATIONS;
+	bool is_rotation_allowed = true;
+	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
+		if (!is_valid_position(tmp.blocks[i].pos)) {
+			// rotation would go out of map or collide with a fixed block -> rotating not allowed
+			is_rotation_allowed = false;
+		}
+	}
+	if (is_rotation_allowed) {
+		current.rotations[0] = tmp;
+		current_rotation = (current_rotation + 1) % NUM_ROTATIONS;
+	}
 }
 
 int get_max_y_of_fixed_blocks(void) {

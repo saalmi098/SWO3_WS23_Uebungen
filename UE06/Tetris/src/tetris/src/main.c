@@ -43,7 +43,7 @@ void on_current_tetrimino_collision(void) {
 		block b = current.rotations[0].blocks[i];
 		set_block_at(b.pos, b);
 		if (get_max_y_of_fixed_blocks() >= GB_ROWS - 1) {
-			gameover = true; // TODO restart game
+			gameover = true;
 		}
 	}
 
@@ -70,7 +70,7 @@ void render_blocks(void) {
 			block b = get_block_at(pos);
 			if (!is_empty_block(b))
 			{
-				renderer_render(pos, b.color); // TODO maybe use b.pos if weird errors occur
+				renderer_render(pos, b.color);
 			}
 		}
 	}
