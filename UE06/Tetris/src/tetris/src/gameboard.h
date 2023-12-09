@@ -19,6 +19,6 @@ int get_current_rotation(void);
 bool try_move_current(int const dx, int const dy);
 bool try_move(block * b, int const dx, int const dy);
 void rotate_current_clockwise(void);
-void check_and_delete_completed_rows(void);
+bool check_and_delete_completed_rows(void);
 
 #endif

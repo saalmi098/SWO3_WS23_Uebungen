@@ -130,9 +130,10 @@ bool is_row_completed(int row) {
 	return true;
 }
 
-void check_and_delete_completed_rows(void) {
+bool check_and_delete_completed_rows(void) {
 	int row = 0;
 	int const highest_row = GB_ROWS - 1; // TODO Performance: get_highest_row() or new global variable
+	bool any_row_deleted = false;
 	while (row <= highest_row) {
 		if (is_row_completed(row)) {
 			// clear row
@@ -157,11 +158,15 @@ void check_and_delete_completed_rows(void) {
 					}
 				}
 			}
+
+			any_row_deleted = true;
 		}
 		else {
 			row++;
 		}
 	}
+
+	return any_row_deleted;
 }
 
 // Funktion zur Rotation der Tetrimino-Blöcke um 90 Grad im Uhrzeigersinn

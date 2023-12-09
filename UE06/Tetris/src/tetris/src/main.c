@@ -7,6 +7,8 @@
 #include "renderer.h"
 #include "types.h"
 
+#define TIMER_DECREASE_FACTOR 1.5
+
 void on_current_tetrimino_collision(void);
 
 void gameloop(key_t const key, action_t const action) {
@@ -21,7 +23,8 @@ void gameloop(key_t const key, action_t const action) {
 
 	if (key == key_up && action == action_press) {
 		rotate_current_clockwise();
-	} else if (action == action_press || action == action_repeat) {
+	}
+	else if (action == action_press || action == action_repeat) {
 		bool move_successful = try_move_current(dx, dy);
 		if (!move_successful && dx == 0) {
 			on_current_tetrimino_collision();
@@ -38,7 +41,11 @@ void on_current_tetrimino_collision(void) {
 		set_block_at(b.pos, b);
 	}
 
-	check_and_delete_completed_rows();
+	bool any_row_deleted = check_and_delete_completed_rows();
+	if (any_row_deleted) {
+		// increase game speed
+		timer_set_interval(timer_get_interval() / TIMER_DECREASE_FACTOR);
+	}
 
 	spawn_new_tetrimino();
 }
