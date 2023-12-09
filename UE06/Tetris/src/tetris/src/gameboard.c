@@ -27,6 +27,8 @@ void init_gameboard(void) {
 			set_block_at(pos, empty_block);
 		}
 	}
+
+	max_y = -1;
 }
 
 block get_block_at(position const pos) {

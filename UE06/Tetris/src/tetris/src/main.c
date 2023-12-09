@@ -11,6 +11,8 @@
 
 #define TIMER_DECREASE_FACTOR 1.5
 
+bool gameover = false;
+
 void on_current_tetrimino_collision(void);
 
 void gameloop(key_t const key, action_t const action) {
@@ -41,7 +43,7 @@ void on_current_tetrimino_collision(void) {
 		block b = current.rotations[0].blocks[i];
 		set_block_at(b.pos, b);
 		if (get_max_y_of_fixed_blocks() >= GB_ROWS - 1) {
-			printf("gameover\n"); // TODO restart game
+			gameover = true; // TODO restart game
 		}
 	}
 
@@ -82,18 +84,29 @@ void on_timer_elapsed(void) {
 	on_key_pressed(key_down, action_press);
 }
 
+void init_new_game(void) {
+	timer_set_interval(TIMER_DEFAULT_INTERVAL);
+	timer_reset();
+
+	gameover = false;
+	init_gameboard();
+	spawn_new_tetrimino();
+}
+
 int main() {
 	// TODO Repo in ue05-saalmi umziehen!!!!
-
-	srand((unsigned)time(0));
-
-	init_gameboard();
 	renderer_init(GB_ROWS, GB_COLS, on_key_pressed);
 	timer_init(on_timer_elapsed);
 
-	spawn_new_tetrimino();
+	srand((unsigned)time(0));
+	init_new_game();
 
 	while(renderer_open()) {
+		if (gameover) {
+			init_new_game();
+			gameover = false;
+		}
+
 		renderer_begin_frame();
 
 		timer_test();

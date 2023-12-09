@@ -1,6 +1,8 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#define TIMER_DEFAULT_INTERVAL 0.5
+
 typedef void(*timer_func)(void);
 
 void   timer_init(timer_func on_tick);

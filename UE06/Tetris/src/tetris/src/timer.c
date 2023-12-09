@@ -6,7 +6,7 @@ static
 timer_func callback;
 
 static
-double interval = 0.5;
+double interval = TIMER_DEFAULT_INTERVAL;
 
 extern
 void timer_init(timer_func on_tick) {
