@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <stdio.h>
 #include "gameboard.h"
 #include "types.h"
 
@@ -169,14 +170,28 @@ bool check_and_delete_completed_rows(void) {
 	return any_row_deleted;
 }
 
-void rotate_current_clockwise(void) {
+void rotate_current(bool clockwise) {
 	tetrimino_rotation tmp = current.rotations[0];
 
+	int rot_index;
+	if (clockwise) {
+		rot_index = current_rotation;
+	} else {
+		rot_index = ((current_rotation - 1) % NUM_ROTATIONS);
+		if (rot_index == -1)
+			rot_index = NUM_ROTATIONS - 1;
+	}
+
 	for (int i = 0; i < NUM_TETRIMINO_BLOCKS; i++) {
-		tmp.blocks[i].pos.x +=
-			tetriminos[current_form].rotations[current_rotation].blocks[i].pos.x;
-		tmp.blocks[i].pos.y +=
-			tetriminos[current_form].rotations[current_rotation].blocks[i].pos.y;
+		int delta_x = tetriminos[current_form].rotations[rot_index].blocks[i].pos.x;
+		int delta_y = tetriminos[current_form].rotations[rot_index].blocks[i].pos.y;
+		if (clockwise) {
+			tmp.blocks[i].pos.x += delta_x;
+			tmp.blocks[i].pos.y += delta_y;
+		} else {
+			tmp.blocks[i].pos.x -= delta_x;
+			tmp.blocks[i].pos.y -= delta_y;
+		}
 	}
 
 	bool is_rotation_allowed = true;
@@ -186,9 +201,15 @@ void rotate_current_clockwise(void) {
 			is_rotation_allowed = false;
 		}
 	}
+
 	if (is_rotation_allowed) {
 		current.rotations[0] = tmp;
-		current_rotation = (current_rotation + 1) % NUM_ROTATIONS;
+		if (clockwise) {
+			current_rotation = (current_rotation + 1) % NUM_ROTATIONS;
+		}
+		else {
+			current_rotation = rot_index;
+		}
 	}
 }
 

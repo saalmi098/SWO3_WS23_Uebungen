@@ -24,9 +24,12 @@ void gameloop(key_t const key, action_t const action) {
 		case key_left: dx = -1; break;
 		case key_right: dx = 1; break;
 	}
-
-	if (key == key_up && action == action_press) {
-		rotate_current_clockwise();
+	
+	if ((key == key_up || key == key_e) && action == action_press) {
+		rotate_current(true);
+	}
+	else if (key == key_q && action == action_press) {
+		rotate_current(false);
 	}
 	else if (action == action_press || action == action_repeat) {
 		bool move_successful = try_move_current(dx, dy);
