@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -97,7 +96,6 @@ void init_new_game(void) {
 }
 
 int main() {
-	// TODO Repo in ue05-saalmi umziehen!!!!
 	renderer_init(GB_ROWS, GB_COLS, on_key_pressed);
 	timer_init(on_timer_elapsed);
 
