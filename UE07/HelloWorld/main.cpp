@@ -27,6 +27,7 @@ void test_1() {
 	std::cout << "Input: " << str << '\n';
 
 	str2 += str + str3; // man muss nicht mehr wie in C Speicher allokieren, strcopy(), ...
+	std::cout << str2;
 }
 
 void test_2() {
@@ -63,6 +64,8 @@ void test_3() {
 	//r.write(file) << " some text\n";
 
 	file << "r: " << r << " some text\n"; // operator overloading notwendig (für shift-left op.)
+										  // zuerst wird "r: " in file geschrieben -> Datentyp von file wird retourniert
+										  // dann wird r in file geschrieben -> Datentyp von file wird retourniert usw.
 }
 
 void test_4() {
@@ -82,7 +85,8 @@ void test_4() {
 								 // = "Conversion by Constructor"
 	std::cout << 3 * r4 << '\n';
 
-	std::cout << std::boolalpha << (r4 == rational{ 42,13 }) << '\n'; // std::boolalpha damit 0/1 als False/True ausgegeben wird
+	std::cout << std::boolalpha << (r4 == rational{ 42,13 }) << '\n'; // true, weil == op. überladen wurde (Brüche werden gekürzt verglichen)
+																	  // std::boolalpha damit 0/1 als False/True ausgegeben wird
 
 	int num{ r4.num()};
 	r4.num() *= 1;
