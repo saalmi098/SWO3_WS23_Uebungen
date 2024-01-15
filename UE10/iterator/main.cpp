@@ -28,6 +28,28 @@ template<typename T> class rational {
 	T n;
 };
 
+//class range final {
+//	begin()
+//	end()
+//};
+
+template <typename T> using unary_function	= void (T const &);
+template <typename T> using unary_predicate	= bool (T const&);
+
+template <typename I, typename F, typename P> void for_each_if(
+	I b,
+	I const e,
+	F f,
+	P const p) {
+	//for (auto const& elem : range{ b, e }) 
+	// - for mit Doppelpunkt braucht einen Datentyp, der begin(), end() und == Operator implementiert
+
+	for (; b != e; ++b) {
+		if (p(*b))
+			f(*b);
+	}
+}
+
 void test_templates() {
 	// Datentyp-Parameter in spitzer Klammer kann man weglassen, wenn der Compiler diesen aus
 	// der Parameter-Liste er#schließen kann
@@ -93,6 +115,8 @@ void test_std_vector() {
 
 template <typename E> class array_iterator {
 public:
+	using value_type = E; // für for_each_if() Funktion
+
 	array_iterator(E* const position) : m_position{ position } {
 	}
 
@@ -120,7 +144,7 @@ public:
 	}
 
 private:
-	E* m_position{ nullptr };
+	E* m_position{ nullptr }; // non-owning pointer
 };
 
 template <typename E, int N> class array {
@@ -160,6 +184,18 @@ template <typename T> void print(T const & t) {
 	std::cout << "'" << t << "'\n";
 }
 
+template<typename T> struct printer {
+	void operator () (T const & value) const {
+		print(value);
+	}
+};
+
+struct predicate {
+	auto operator () (std::string const& str) const {
+		return str.size() == 4;
+	}
+};
+
 void test_array() {
 	array<std::string, 5> a1{};
 	//array<std::string, 20> a2{}; // a1 und a2 haben 2 verschiedene Datentypen
@@ -175,22 +211,105 @@ void test_array() {
 	for (int i{ 0 }; i < a1.size(); ++i) {
 		std::cout << "'" << a1[i] << "'\n";
 	}
-	std::cout << '\n';
+	std::cout << "---------------------------------\n";
 
 	array_iterator <std::string>		b{ a1.begin() };
 	array_iterator <std::string> const	e{ a1.end() };
+
+	std::cout << "---------------------------------\n";
 
 	while (b != e)
 		std::cout << *b++ << ' ';
 	std::cout << '\n';
 
+	std::cout << "---------------------------------\n";
+
 	for (auto const& elem : a1)
 		std::cout << elem << ' ';
 	std::cout << '\n';
 
+	std::cout << "---------------------------------\n";
+
 	std::cout << "\nFor Each:\n";
 	std::for_each(a1.begin(), a1.end(), print<std::string>); // dem for_each muss man
 	// in spitzen Klammern mitgeben, welches print aufgerufen werden soll
+
+	std::cout << "---------------------------------\n";
+
+	for_each_if(a1.begin(), a1.end(), [](std::string const& str) { // lambda expression
+		std::cout << "l: " << str << '\n';
+	}, [](std::string const& str) { // lambda expression
+		return str.size() == 4; // gibt nur mehr "Susi" aus
+	});
+
+	std::cout << "---------------------------------\n";
+	
+	for_each_if(a1.begin(), a1.end(), printer<std::string>{}, predicate{});
+}
+
+void test_callable() {
+	auto f{ [](int const i) {
+		std::cout << i;
+	} }; // Variable f enthält eine lambda-Funktion
+
+	f(42);
+}
+
+//static int sum{}; // Problem: globale Variablen
+//static char letter{};
+//void sum_up(std::string const& str) {
+//	sum += str.size();
+//}
+//
+//bool starts_with(std::string const& str) {
+//	return !str.empty() && str[0] == letter;
+//}
+
+class size_adder {
+public:
+	size_adder(int& s) : m_sum{ s } {
+	}
+
+	void operator () (std::string const& str) {
+		m_sum += str.size();
+	}
+
+private:
+	int & m_sum;
+};
+
+class starts_with_checker {
+public:
+	starts_with_checker(char const l) : m_letter{ l } {
+	}
+
+	bool operator () (std::string const& str) const {
+		return !str.empty() && str[0] == m_letter;
+	}
+
+private:
+	char const m_letter{};
+};
+
+void test_array2() {
+	array<std::string, 5> a{};
+	a[0] = "Hansi";
+	a[1] = "Susi";
+	a[2] = "Karli";
+	a[4] = "Seppi";
+	
+	//for_each_if(a.begin(), a.end(), sum_up, starts_with);
+
+	int i{}; // wird an size_adder als Referenz übergeben
+	for_each_if(a.begin(), a.end(), size_adder { i }, starts_with_checker{'S'});
+	std::cout << "Anzahl der Zeichen: " << i << '\n';
+
+	std::cout << "---------------------------------\n";
+
+	for_each_if(a.begin(), a.end(), [&i](std::string const& str) { // in eckige Klammern: "capture list"
+		i += str.size();
+	}, starts_with_checker{'S'});
+	std::cout << "Anzahl der Zeichen: " << i << '\n';
 }
 
 int main() {
@@ -198,10 +317,14 @@ int main() {
 
 	//test_templates();
 
-	try {
-		test_array();
-	}
-	catch (std::exception const & x) {
-		std::cerr << "Error: " << x.what() << '\n' << std::flush;
-	}
+	//try {
+	//	test_array();
+	//}
+	//catch (std::exception const & x) {
+	//	std::cerr << "Error: " << x.what() << '\n' << std::flush;
+	//}
+
+	//test_callable();
+
+	test_array2();
 }
