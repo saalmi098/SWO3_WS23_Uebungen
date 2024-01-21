@@ -92,7 +92,7 @@ void foo(std::vector<int> v) { // kopiert vector bei Aufruf (Call By Value)
 	// Iterator ist abstrakter
 
 	// Schreibweise ohne auto:
-	std::vector<int>::iterator b{ v.begin() };
+	std::vector<int>::iterator b{v.begin()};
 	std::vector<int>::iterator e{ v.end() };
 
 	// Von hinten nach vorne iterieren:
@@ -236,9 +236,9 @@ void test_array() {
 
 	std::cout << "---------------------------------\n";
 
-	for_each_if(a1.begin(), a1.end(), [](std::string const& str) { // lambda expression
+	for_each_if(a1.begin(), a1.end(), [](std::string const& str) { // lambda expression (type parameter "F")
 		std::cout << "l: " << str << '\n';
-	}, [](std::string const& str) { // lambda expression
+	}, [](std::string const& str) { // lambda expression (type parameter "P")
 		return str.size() == 4; // gibt nur mehr "Susi" aus
 	});
 
