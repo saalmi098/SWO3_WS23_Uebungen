@@ -1,0 +1,40 @@
+===== FIRST-TIME PROJECT SETUP =====
+
+From the project root:
+
+mkdir build
+cd build
+set VCPKG_DEFAULT_TRIPLET=x64-windows (as vcpkg still defaults to 32bit for historical reasons)
+cmake -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake ../src
+
+
+===== BUILDING THE PROJECT =====
+
+In BUILD:
+
+cmake --build . [--parallel] [--clean-first]
+
+
+===== GENERATING THE PROJECT PACKAGE =====
+
+In BUILD:
+
+cpack
+
+
+===== GENERATING DEPENDENCIES USING VCPKG =====
+
+From the project root:
+
+Windows:     rd /S /Q vcpkg
+Linux/macOS: rm -rf vcpkg
+
+git clone https://github.com/microsoft/vcpkg
+cd vcpkg
+
+Windows:     ./bootstrap-vcpkg.bat
+Linux/macOS: ./bootstrap-vcpkg.sh
+
+Windows: set VCPKG_DEFAULT_TRIPLET=x64-windows
+
+./vcpkg install wxwidgets glfw3

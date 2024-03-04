@@ -447,3 +447,6 @@ _CPack_Packages/
 CPackConfig.cmake
 CPackSourceConfig.cmake
 _deps
+build/
+ml5/
+vcpkg/
