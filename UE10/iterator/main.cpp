@@ -18,7 +18,7 @@ std::string max(std::string const & a, std::string const & b, std::string const 
 }*/
 
 // T ... Variable, die einen Datentyp enthält
-// der Compiler erstellt für jeden Datentyp, für den max aufgerufen wird, eine Überladung (1 für int, 1 für int, ...)
+// der Compiler erstellt für jeden Datentyp, für den max aufgerufen wird, eine Überladung (1 für int, 1 für double, ...)
 template<typename T> T max(T const a, T const b, T const c) {
 	return std::max(a, std::max(b, c));
 }
@@ -52,7 +52,7 @@ template <typename I, typename F, typename P> void for_each_if(
 
 void test_templates() {
 	// Datentyp-Parameter in spitzer Klammer kann man weglassen, wenn der Compiler diesen aus
-	// der Parameter-Liste er#schließen kann
+	// der Parameter-Liste erschließen kann
 	std::cout << max /*<int>*/ (42, 99, 17) << '\n';
 	std::cout << max /*<double>*/ (4.2, 9.9, 1.7) << '\n';
 

@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 double const PI = 3.1415927;
 
@@ -17,6 +18,13 @@ int main (int argc, char * argv []) {
         printf("%d-tes Argument: '%d'\n", i, value);
         printf("%d-tes Argument: '%d', Wurzel: %d\n", i, value, root);
     }
+
+    char str1[255];
+
+    printf("Enter name: ");
+    scanf("%s", str1);
+
+    printf("\nEntered Name: %s (length: %ld)\n", str1, strlen(str1));
 
     return EXIT_SUCCESS;
 }

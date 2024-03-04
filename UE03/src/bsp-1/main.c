@@ -5,8 +5,8 @@
 // Spitze Klammer ... Systemdateien
 // Anführungszeichen ... eigene Projektdateien
 
-// #include "./geo/geo.h"
-// #include "./weight/weight.h"
+#include "./geo/geo.h"
+#include "./weight/weight.h"
 
 #define MAX_N 100
 
@@ -49,8 +49,8 @@ void place_queen(int col[], int i, int n) {
 }
 
 int main() {
-    // printf("volume: %7.3f\n", volume(1, 2, 3));
-    // printf("weight: %7.3f\n", weight(1, 2, 3, 4));
+    printf("volume: %7.3f\n", volume(1, 2, 3));
+    printf("weight: %7.3f\n", weight(1, 2, 3, 4));
     
     int col [MAX_N] = {0};
     const int queen_count = 4;

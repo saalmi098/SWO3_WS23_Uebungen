@@ -35,6 +35,7 @@ void test_1() {
     print_string("\n");
 
     printf("size: %d\n", string_length("Hansi"));
+    printf("sizeof(s1): %ld\n", sizeof(s1));
 }
 
 void test_2() {
@@ -45,9 +46,13 @@ void test_2() {
     printf("strcmp: %d\n", strcmp("Susi", "Hansi"));
     printf("strcmp: %d\n", strcmp("FH", s1)); // returns -32 because of "FH " (space at end = ASCII-Dec 32)
 
-    print_string(s3); print_string("\n");
+    if (!strcmp("FH ", s1)) { // strcomp == 0 ... equal
+        printf("strings are equal\n");
+    }
+
+    print_string(s3); printf(" (length: %d)", string_length(s3)); print_string("\n");
     strcpy(s3, s2); // copies the 10 bytes from "Hagenberg\0" to s3
-    print_string(s3); print_string("\n");
+    print_string(s3); printf(" (length: %d)", string_length(s3)); print_string("\n");
 }
 
 void test_3() {
